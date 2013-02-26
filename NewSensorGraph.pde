@@ -2,35 +2,40 @@ import processing.serial.*;
 
 Serial myPort;
 
-int[] valueArray = new int[width];
+int windowWidth = 700;
+int windowHeight = 300;
+
+int[] valueArray = new int[windowWidth];
 
 void setup() {
-  size(400, 300);
+  size(windowWidth, windowHeight);
   println(Serial.list());
-  
+
   myPort = new Serial(this, Serial.list()[4], 9600);
   myPort.bufferUntil('\n');
-  
-  background(0);
 }
 
 void draw() {
-  for(int i=valueArray.length; i>0; i--) {
-    stroke(127, 34, 255);
-    line(i, height, i, height - valueArray[i]);
+  background(0);
+  if (valueArray != null) {
+    for (int i=0; i<valueArray.length; i++) {
+      stroke(127, 34, 255);
+      line(i, height, i, height - valueArray[i]);
+    }
   }
 }
 
 void serialEvent(Serial myPort) {
   String inString = myPort.readStringUntil('\n');
-  
-  if(inString != null) {
+
+  if (inString != null) {
     inString = trim(inString);
-    int inByte = int(inString);
-    inByte = int(map(inByte, 0, 1023, 0, height));
-    
+    float inByte = float(inString);
+    println(inByte);
+    inByte = map(inByte, 0, 1023, 0, height);
+
     // Add last value to array
-    shiftAndAdd(valueArray, inByte);
+    shiftAndAdd(valueArray, int(inByte));
   }
 }
 
@@ -39,3 +44,4 @@ void shiftAndAdd(int a[], int val) {
   System.arraycopy(a, 1, a, 0, a_length-1);
   a[a_length-1] = val;
 }
+
